@@ -2,14 +2,12 @@
 
 /**
  * Plugin Name: woo-slider
- * Description: All the code in this plugin is for learning purposes only. It is recommended not to use this on live projects.
- * Author: Tanuj Patra
- * Author URI: https://www.youtube.com/channel/UChvgNtbMI8Pnan7R7FrSIng
+ * Description:  my Woocommerce Slider
+ * Author: NF Tushar
  * Version: 1.0.0
  * Requires at least: 5.7
  * Requires PHP: 7.2
- * Plugin URI: https://github.com/tanujpatra228/youtube/tree/iws-woo-extension
- * Text Domain: iws-woo-extension
+ * Text Domain: woo-slider
  */
 
 // Terminate if accessed directly
@@ -17,8 +15,8 @@ if (!defined('ABSPATH')) {
     die();
 }
 
-define('IWS_WOO_EXT_TXT_DOMAIN', 'iws-geo-form-fields');
-define('IWS_WOO_EXT_SLUG', 'iws-geo-form-fields');
+define('IWS_WOO_EXT_TXT_DOMAIN', 'woo-slider');
+define('IWS_WOO_EXT_SLUG', 'woo-slider');
 define('IWS_WOO_EXT_PLUGIN_URL', plugin_dir_url(__FILE__));
 define('IWS_WOO_EXT_PLUGIN_PATH', plugin_dir_path(__FILE__));
 
@@ -45,6 +43,30 @@ function iws_load_scripts()
 }
 add_action('wp_enqueue_scripts', 'iws_load_scripts');
 
+function iws_get_product_disc($product)
+{
+    if ($product->is_type('simple')) {
+        $reg_price = $product->get_regular_price();
+        $sale_price = $product->get_sale_price();
+
+        // Discount% = (Original Price - Sale price) / Original price * 100
+        $disc = ($reg_price > 0) ? (($reg_price - $sale_price) / $reg_price) * 100 : 0;
+    } else if ($product->is_type('variable')) {
+        $disc_percentage = [];
+        $prices = $product->get_variation_prices();
+
+        foreach ($prices['price'] as $key => $price) {
+            if ($prices['regular_price'][$key] !== $price) {
+                $disc_percentage[] = round((($prices['regular_price'][$key] - $prices['sale_price'][$key]) / $prices['regular_price'][$key]) * 100);
+            }
+        }
+        $disc = max($disc_percentage);
+    }
+
+    $html = "<span class='variant-offer'>$disc% Off</span>";
+    return $html;
+}
+
 function iws_product_slider($atts)
 {
     // Check if WooCommerce is active
@@ -56,7 +78,6 @@ function iws_product_slider($atts)
             ),
             $atts
         );
-
 
         $tag = explode(',', sanitize_text_field($atts['tag']));
         $count = sanitize_text_field($atts['count']);
@@ -77,16 +98,7 @@ function iws_product_slider($atts)
         $products = new WP_Query($query);
 
         if ($products->have_posts()) :
-            while ($products->have_posts()) :
-                $products->the_post();
-                echo get_the_title();
-
-            endwhile;
-        endif;
-
-
-        ob_start();
-        if ($products->have_posts()) :
+            ob_start();
 ?>
             <div class="iws-product-slider woocommerce">
                 <div class="iws-inner">
@@ -97,19 +109,17 @@ function iws_product_slider($atts)
                                 $products->the_post();
                                 $title = get_the_title();
                                 $permalink = get_the_permalink();
-                                // $product = WC_Product(get_the_id());
                                 $product = wc_get_product(get_the_id());
-                                
+
                                 $img = $product->get_image('woocommerce_thumbnail');
                                 $avg_rating = $product->get_average_rating();
                                 $rating_percent = ($avg_rating / 5) * 100;
                                 $rating_count = $product->get_review_count();
-
+                                $price = $product->get_price_html();
                             ?>
                                 <div class="swiper-slide">
                                     <div class="iws-slide-content">
                                         <div class="iws-product-img">
-                                            <!-- <img src="http://localhost/youtube/wp-content/uploads/2022/02/cap-2-300x300.jpg" alt="product"> -->
                                             <?php echo $img; ?>
                                             <i class="far fa-heart"></i>
                                         </div>
@@ -124,14 +134,14 @@ function iws_product_slider($atts)
                                                 <span class="total-review">( <?php echo $rating_count; ?> Reviews )</span>
                                             </div>
                                             <div class="price-wrap">
-                                                <span class="amount">Rs.7,500</span>
-                                                <del class="amount">Rs.12,400</del>
-                                                <span class="variant-offer">30% Off</span>
+                                                <?php echo $price;
+                                                if ($product->is_on_sale()) :
+                                                    echo iws_get_product_disc($product);
+                                                endif; ?>
                                             </div>
                                         </div>
                                     </div>
                                 </div>
-
                             <?php
                             endwhile;
                             ?>
@@ -142,9 +152,9 @@ function iws_product_slider($atts)
                 </div>
             </div>
 <?php
+            return ob_get_clean();
         endif;
         wp_reset_postdata();
-        return ob_get_clean();
     }
 }
 add_shortcode('iws-product-slider', 'iws_product_slider');
