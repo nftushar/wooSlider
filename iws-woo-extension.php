@@ -64,6 +64,7 @@ function iws_get_product_disc($product)
         }
         $disc = max($disc_percentage);
     } elseif ($product->is_type('grouped')) {
+        echo "Hello grouped"; 
         $child_products = $product->get_children();
 
         // Print out the child products for debugging
