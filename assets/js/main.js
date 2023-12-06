@@ -1,8 +1,8 @@
 /**
- * IWS Woo Extension - 1.0.0
+ * WS Woo Slider - 1.0.0
  */
-jQuery(document).ready(function(){
-    var swiper = new Swiper(".iws-swiper", {
+jQuery(document).ready(function () {
+    var swiper = new Swiper(".ws-swiper", {
         slidesPerView: 2,
         spaceBetween: 10,
         loop: true,
