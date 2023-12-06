@@ -51,7 +51,7 @@ function iws_get_product_disc($product)
 
         // Discount% = (Original Price - Sale price) / Original price * 100
         // $disc = ($reg_price > 0) ? (($reg_price - $sale_price) / $reg_price) * 100 : 0;
-        $disc = (($reg_price - $sale_price) / $reg_price) * 100;
+        $disc = round((($reg_price - $sale_price) / $reg_price) * 100);
 
     } else if ($product->is_type('variable')) {
         $disc_percentage = [];
