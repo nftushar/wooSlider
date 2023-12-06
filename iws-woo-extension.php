@@ -50,7 +50,9 @@ function iws_get_product_disc($product)
         $sale_price = $product->get_sale_price();
 
         // Discount% = (Original Price - Sale price) / Original price * 100
-        $disc = ($reg_price > 0) ? (($reg_price - $sale_price) / $reg_price) * 100 : 0;
+        // $disc = ($reg_price > 0) ? (($reg_price - $sale_price) / $reg_price) * 100 : 0;
+        $disc = (($reg_price - $sale_price) / $reg_price) * 100;
+
     } else if ($product->is_type('variable')) {
         $disc_percentage = [];
         $prices = $product->get_variation_prices();
@@ -61,6 +63,15 @@ function iws_get_product_disc($product)
             }
         }
         $disc = max($disc_percentage);
+    } elseif ($product->is_type('grouped')) {
+        $child_products = $product->get_children();
+
+        // Print out the child products for debugging
+        echo "<pre>";
+        print_r($child_products);
+        echo"</pre>";
+
+        // You can customize further handling of grouped products here if needed
     }
 
     $html = "<span class='variant-offer'>$disc% Off</span>";
