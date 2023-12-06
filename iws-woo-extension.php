@@ -66,7 +66,7 @@ function iws_get_product_disc($product)
     } elseif ($product->is_type('grouped')) {  
 
         $child_products = $product->get_children();
-        // $discount = [];
+        $discount = [];
         // Print out the child products for debugging
         // echo "<pre>";
         // print_r($child_products);
@@ -77,9 +77,10 @@ function iws_get_product_disc($product)
             $reg_price = $child_product->get_regular_price();
             $sale_price = $child_product->get_sale_price();
             if(!empty($sale_price) && $sale_price != 0){
-            $disc = (($reg_price - $sale_price) / $reg_price) * 100;
+           $discount[] = round((($reg_price - $sale_price) / $reg_price) * 100);
             }
         }
+        $disc = max($discount);
     }
 
     $html = "<span class='variant-offer'>$disc% Off</span>";
