@@ -171,3 +171,17 @@ function ws_product_slider($atts)
     }
 }
 add_shortcode('ws-product-slider', 'ws_product_slider');
+
+function ws_custom_field(){
+    woocommerce_wp_text_input(
+        array(
+            'id' => 'iws_custom_text_input',
+            'label' => __('Custom Field', 'woocommerce'),
+            'placeholder' => __('Your Custom Field data', 'woocommerce'),
+            'description' => __('This is Description', 'woocommerce'),
+            'desc_tip' => true,
+        )
+    );
+}
+
+add_action('woocommerce_product_options_general_product_data', 'ws_custom_field');
