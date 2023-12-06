@@ -141,7 +141,8 @@ function iws_product_slider($atts)
                                     <div class="iws-slide-content">
                                         <div class="iws-product-img">
                                             <?php echo $img; ?>
-                                            <i class="far fa-heart"></i>
+                                            <!-- <i class="far fa-heart"></i> -->
+                                            <?php echo do_shortcode('[ti_wishlists_addtowishlist loop=yes]'); ?>
                                         </div>
                                         <div class="iws-product-detail">
                                             <p><a href="<?php echo $permalink; ?>"><?php echo $title; ?></a></p>
