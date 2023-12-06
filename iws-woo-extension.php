@@ -63,16 +63,23 @@ function iws_get_product_disc($product)
             }
         }
         $disc = max($disc_percentage);
-    } elseif ($product->is_type('grouped')) {
-        echo "Hello grouped"; 
+    } elseif ($product->is_type('grouped')) {  
+
         $child_products = $product->get_children();
-
+        // $discount = [];
         // Print out the child products for debugging
-        echo "<pre>";
-        print_r($child_products);
-        echo"</pre>";
-
+        // echo "<pre>";
+        // print_r($child_products);
+        // echo"</pre>"; 
         // You can customize further handling of grouped products here if needed
+        foreach($child_products as $product_id){
+            $child_product = wc_get_product($product_id);
+            $reg_price = $child_product->get_regular_price();
+            $sale_price = $child_product->get_sale_price();
+            if(!empty($sale_price) && $sale_price != 0){
+            $disc = (($reg_price - $sale_price) / $reg_price) * 100;
+            }
+        }
     }
 
     $html = "<span class='variant-offer'>$disc% Off</span>";
